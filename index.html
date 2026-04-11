@@ -1,744 +1,630 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The Chronicles of Xohos — Lore Compendium</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
-<style>
-  :root {
-    --gold: #c9a84c;
-    --gold-light: #e8d08a;
-    --gold-dim: #7a6030;
-    --ink: #1a1510;
-    --parchment: #f5ead6;
-    --parchment-dark: #e8d9b8;
-    --parchment-deep: #d4c49a;
-    --red-wax: #8b2020;
-    --red-wax-light: #b83030;
-    --shadow: rgba(0,0,0,0.45);
-    --text-main: #2a1f0e;
-    --text-muted: #5a4a30;
-    --border: #c9a84c55;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Krønikerne om Xohos, Et lore kompendium</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8d08a;
+      --gold-dim: #7a6030;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #0e0b07;
+      background-image:
+              radial-gradient(ellipse at 20% 10%, #1e1508 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 90%, #180f00 0%, transparent 60%),
+              url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%230e0b07'/%3E%3Crect width='1' height='1' fill='%23ffffff08'/%3E%3C/svg%3E");
+      color: #d4bc8a;
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 18px;
+      line-height: 1.75;
+      min-height: 100vh;
+    }
 
-  html { scroll-behavior: smooth; }
+    /* HEADER */
+    header { position: relative; text-align: center; padding: 5rem 2rem 4rem; overflow: hidden; }
+    header::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+              radial-gradient(ellipse at 50% 0%, #3d2a0a55 0%, transparent 70%),
+              repeating-linear-gradient(0deg, transparent, transparent 60px, #c9a84c08 60px, #c9a84c08 61px),
+              repeating-linear-gradient(90deg, transparent, transparent 60px, #c9a84c08 60px, #c9a84c08 61px);
+      pointer-events: none;
+    }
+    .header-ornament { color: var(--gold-dim); font-size: 1.2rem; letter-spacing: 0.8em; margin-bottom: 1.5rem; opacity: 0.7; }
+    header h1 {
+      font-family: 'Cinzel Decorative', serif; font-size: clamp(2rem, 6vw, 4.2rem); font-weight: 700;
+      color: var(--gold); text-shadow: 0 0 60px #c9a84c44, 0 2px 4px #000;
+      letter-spacing: 0.05em; line-height: 1.2; margin-bottom: 0.5rem;
+    }
+    header .world-subtitle {
+      font-family: 'Cinzel', serif; font-size: 1rem; color: var(--gold-dim);
+      letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 2rem;
+    }
+    .header-rule { display: flex; align-items: center; gap: 1rem; justify-content: center; margin: 1.5rem 0; color: var(--gold-dim); font-size: 1.4rem; }
+    .header-rule::before { content: ''; flex: 1; max-width: 200px; height: 1px; background: linear-gradient(to right, transparent, var(--gold-dim)); }
+    .header-rule::after  { content: ''; flex: 1; max-width: 200px; height: 1px; background: linear-gradient(to left, transparent, var(--gold-dim)); }
+    header p.tagline { font-style: italic; font-size: 1.15rem; color: #c9a84c99; max-width: 500px; margin: 0 auto; }
 
-  body {
-    background-color: #0e0b07;
-    background-image:
-      radial-gradient(ellipse at 20% 10%, #1e1508 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 90%, #180f00 0%, transparent 60%),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%230e0b07'/%3E%3Crect width='1' height='1' fill='%23ffffff08'/%3E%3C/svg%3E");
-    color: var(--text-main);
-    font-family: 'Crimson Pro', Georgia, serif;
-    font-size: 18px;
-    line-height: 1.75;
-    min-height: 100vh;
-  }
+    /* NAV */
+    nav { position: sticky; top: 0; z-index: 200; background: rgba(10,7,3,0.92); border-bottom: 1px solid var(--gold-dim); backdrop-filter: blur(8px); }
+    nav ul { list-style: none; display: flex; justify-content: center; flex-wrap: wrap; max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+    nav ul li a {
+      display: block; padding: 0.85rem 1.4rem;
+      font-family: 'Cinzel', serif; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #c9a84c99; text-decoration: none; transition: color 0.2s, border-color 0.2s; border-bottom: 2px solid transparent;
+    }
+    nav ul li a:hover { color: var(--gold); border-bottom-color: var(--gold); }
 
-  /* ── HEADER ── */
-  header {
-    position: relative;
-    text-align: center;
-    padding: 5rem 2rem 4rem;
-    overflow: hidden;
-  }
+    /* MAIN */
+    main { max-width: 1100px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+    .lore-section { margin-bottom: 5rem; }
+    .section-header { display: flex; align-items: center; gap: 1.2rem; margin-bottom: 2.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gold-dim); }
+    .section-icon { font-size: 1.8rem; flex-shrink: 0; filter: drop-shadow(0 0 8px #c9a84c44); }
+    .section-header h2 { font-family: 'Cinzel Decorative', serif; font-size: clamp(1.3rem, 3vw, 1.9rem); font-weight: 400; color: var(--gold); text-shadow: 0 0 30px #c9a84c33; letter-spacing: 0.04em; }
 
-  header::before {
-    content: '';
-    position: absolute; inset: 0;
-    background:
-      radial-gradient(ellipse at 50% 0%, #3d2a0a55 0%, transparent 70%),
-      repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 60px,
-        #c9a84c08 60px,
-        #c9a84c08 61px
-      ),
-      repeating-linear-gradient(
-        90deg,
-        transparent,
-        transparent 60px,
-        #c9a84c08 60px,
-        #c9a84c08 61px
-      );
-    pointer-events: none;
-  }
+    /* CARDS */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+    .lore-card {
+      background: linear-gradient(145deg, #1e180e, #16110a); border: 1px solid #c9a84c33; border-radius: 4px;
+      padding: 1.6rem 1.8rem; position: relative; transition: border-color 0.25s, transform 0.2s; cursor: pointer; overflow: hidden;
+    }
+    .lore-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(to right, transparent, var(--gold-dim), transparent); opacity: 0; transition: opacity 0.25s;
+    }
+    .lore-card:hover { border-color: var(--gold-dim); transform: translateY(-2px); }
+    .lore-card:hover::before { opacity: 1; }
+    .card-read-more {
+      display: inline-block; margin-top: 0.8rem; font-family: 'Cinzel', serif;
+      font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--gold-dim); opacity: 0.7; transition: opacity 0.2s, color 0.2s;
+    }
+    .lore-card:hover .card-read-more { opacity: 1; color: var(--gold); }
+    .card-tag {
+      display: inline-block; font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--gold-dim); background: #c9a84c14; border: 1px solid #c9a84c33; border-radius: 2px; padding: 0.15rem 0.6rem; margin-bottom: 0.8rem;
+    }
+    .lore-card h3 { font-family: 'Cinzel', serif; font-size: 1.15rem; font-weight: 600; color: var(--gold-light); margin-bottom: 0.65rem; line-height: 1.3; }
+    .lore-card > p, .lore-card p { font-size: 0.95rem; color: #c9a84c88; line-height: 1.65; font-style: italic; }
+    .card-divider { height: 1px; background: linear-gradient(to right, transparent, #c9a84c22, transparent); margin: 0.9rem 0; }
+    .card-body { font-size: 0.92rem; color: #d4bc8acc; line-height: 1.7; font-style: normal; }
 
-  .header-ornament {
-    color: var(--gold-dim);
-    font-size: 1.2rem;
-    letter-spacing: 0.8em;
-    margin-bottom: 1.5rem;
-    opacity: 0.7;
-  }
+    /* TIMELINE */
+    .timeline { position: relative; padding-left: 2rem; }
+    .timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: linear-gradient(to bottom, transparent, var(--gold-dim) 10%, var(--gold-dim) 90%, transparent); }
+    .timeline-event { position: relative; margin-bottom: 2.5rem; padding-left: 1.5rem; cursor: pointer; }
+    .timeline-event::before { content: ''; position: absolute; left: -2rem; top: 0.45rem; width: 9px; height: 9px; border-radius: 50%; background: var(--gold-dim); border: 2px solid #1a1208; box-shadow: 0 0 8px #c9a84c66; transition: background 0.2s; }
+    .timeline-event:hover::before { background: var(--gold); }
+    .timeline-era { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 0.25rem; }
+    .timeline-event h3 { font-family: 'Cinzel', serif; font-size: 1.05rem; color: var(--gold-light); margin-bottom: 0.4rem; }
+    .timeline-event p { font-size: 0.95rem; color: #d4bc8acc; max-width: 700px; }
 
-  header h1 {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(2rem, 6vw, 4.2rem);
-    font-weight: 700;
-    color: var(--gold);
-    text-shadow: 0 0 60px #c9a84c44, 0 2px 4px #000;
-    letter-spacing: 0.05em;
-    line-height: 1.2;
-    margin-bottom: 0.5rem;
-  }
+    /* NPC CARDS */
+    .npc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
+    .npc-card { background: #16110a; border: 1px solid #c9a84c22; border-radius: 4px; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.7rem; transition: border-color 0.25s, transform 0.2s; cursor: pointer; }
+    .npc-card:hover { border-color: var(--gold-dim); transform: translateY(-2px); }
+    .npc-avatar { width: 56px; height: 56px; border-radius: 50%; border: 1px solid var(--gold-dim); background: #2a1f0e; display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 1.2rem; color: var(--gold); flex-shrink: 0; margin-bottom: 0.3rem; }
+    .npc-card h3 { font-family: 'Cinzel', serif; font-size: 1.05rem; color: var(--gold-light); line-height: 1.3; }
+    .npc-role { font-style: italic; font-size: 0.9rem; color: var(--gold-dim); }
+    .npc-card p { font-size: 0.9rem; color: #d4bc8acc; line-height: 1.65; }
+    .npc-status { display: inline-block; font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 0.15em; padding: 0.1rem 0.55rem; border-radius: 2px; margin-top: auto; align-self: flex-start; }
+    .npc-status.ally    { background: #0e2d1a; color: #4a9e6a; border: 1px solid #2a5e3a; }
+    .npc-status.neutral { background: #2a220a; color: #c9a84c; border: 1px solid #5a4a20; }
+    .npc-status.hostile { background: #2d0e0e; color: #b84040; border: 1px solid #5e2a2a; }
 
-  header .world-subtitle {
-    font-family: 'Cinzel', serif;
-    font-size: 1rem;
-    color: var(--gold-dim);
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    margin-bottom: 2rem;
-  }
+    /* ARTIFACT CARDS */
+    .artifact-card { display: grid; grid-template-columns: 3.5rem 1fr; gap: 1.2rem; align-items: start; }
+    .artifact-glyph { width: 3.5rem; height: 3.5rem; border: 1px solid var(--gold-dim); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; background: #2a1f0e; flex-shrink: 0; }
+    .artifact-rarity { font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.5rem; display: inline-block; }
+    .rarity-legendary { color: #e87c2a; }
+    .rarity-rare      { color: #6a9ce8; }
+    .rarity-uncommon  { color: #5aad6e; }
 
-  .header-rule {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    justify-content: center;
-    margin: 1.5rem 0;
-    color: var(--gold-dim);
-    font-size: 1.4rem;
-  }
-  .header-rule::before, .header-rule::after {
-    content: '';
-    flex: 1;
-    max-width: 200px;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--gold-dim));
-  }
-  .header-rule::after {
-    background: linear-gradient(to left, transparent, var(--gold-dim));
-  }
+    /* MAP */
+    #world-map { width: 100%; aspect-ratio: 1/1; border: 1px solid var(--gold-dim); border-radius: 4px; margin-bottom: 2.5rem; background: #1a1208; }
+    .leaflet-popup-content-wrapper { background: #1e180e !important; border: 1px solid #7a6030 !important; border-radius: 4px !important; box-shadow: 0 4px 24px rgba(0,0,0,0.6) !important; color: #d4bc8a !important; }
+    .leaflet-popup-tip { background: #1e180e !important; }
+    .leaflet-popup-content { font-family: 'Crimson Pro', serif; font-size: 0.95rem; margin: 10px 14px; }
+    .leaflet-popup-content strong { font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--gold-light); display: block; margin-bottom: 4px; }
+    .leaflet-popup-content em { color: #c9a84c88; font-size: 0.82rem; display: block; margin-bottom: 6px; }
+    .popup-open-btn { display: inline-block; margin-top: 6px; padding: 3px 10px; font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); background: #c9a84c14; border: 1px solid #c9a84c44; border-radius: 2px; cursor: pointer; transition: background 0.2s; }
+    .popup-open-btn:hover { background: #c9a84c22; }
 
-  header p.tagline {
-    font-family: 'Crimson Pro', serif;
-    font-style: italic;
-    font-size: 1.15rem;
-    color: #c9a84c99;
-    max-width: 500px;
-    margin: 0 auto;
-  }
+    /* MODAL */
+    .modal-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 1.5rem; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #1a1208; border: 1px solid var(--gold-dim); border-radius: 6px; max-width: 660px; width: 100%; max-height: 85vh; overflow-y: auto; position: relative; animation: modalIn 0.2s ease; }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .modal-top-rule { height: 2px; background: linear-gradient(to right, transparent, var(--gold), transparent); border-radius: 6px 6px 0 0; }
+    .modal-inner { padding: 2rem 2.2rem 2.2rem; }
+    .modal-tag { display: inline-block; font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-dim); background: #c9a84c14; border: 1px solid #c9a84c33; border-radius: 2px; padding: 0.15rem 0.6rem; margin-bottom: 0.9rem; }
+    .modal h2 { font-family: 'Cinzel', serif; font-size: 1.55rem; color: var(--gold-light); margin-bottom: 0.3rem; line-height: 1.25; }
+    .modal-subtitle { font-style: italic; color: #c9a84c88; font-size: 0.95rem; margin-bottom: 1.4rem; }
+    .modal-divider { height: 1px; background: linear-gradient(to right, transparent, #c9a84c33, transparent); margin: 1.2rem 0; }
+    .modal-section-label { font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 0.4rem; }
+    .modal-body { font-size: 1rem; color: #d4bc8acc; line-height: 1.75; }
+    .modal-body p { margin-bottom: 1rem; }
+    .modal-body p:last-child { margin-bottom: 0; }
+    .modal-close { position: absolute; top: 1rem; right: 1.2rem; background: none; border: none; color: var(--gold-dim); font-size: 1.4rem; cursor: pointer; line-height: 1; transition: color 0.2s; font-family: 'Cinzel', serif; }
+    .modal-close:hover { color: var(--gold); }
+    .modal-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1.5rem; margin-bottom: 0.8rem; }
+    .modal-meta-item { font-size: 0.88rem; color: #d4bc8acc; }
+    .modal-meta-item span { color: var(--gold-dim); font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 1px; }
 
-  /* ── NAV ── */
-  nav {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(10, 7, 3, 0.92);
-    border-bottom: 1px solid var(--gold-dim);
-    backdrop-filter: blur(8px);
-  }
+    /* EDIT NOTE */
+    .edit-note { background: #c9a84c11; border: 1px dashed #c9a84c33; border-radius: 4px; padding: 0.8rem 1.2rem; font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.1em; color: var(--gold-dim); text-align: center; margin-bottom: 3rem; }
 
-  nav ul {
-    list-style: none;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 1rem;
-  }
+    /* FOOTER */
+    footer { text-align: center; padding: 2.5rem 1rem; border-top: 1px solid #c9a84c22; font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.2em; color: var(--gold-dim); opacity: 0.6; }
 
-  nav ul li a {
-    display: block;
-    padding: 0.85rem 1.4rem;
-    font-family: 'Cinzel', serif;
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #c9a84c99;
-    text-decoration: none;
-    transition: color 0.2s, border-color 0.2s;
-    border-bottom: 2px solid transparent;
-  }
-
-  nav ul li a:hover {
-    color: var(--gold);
-    border-bottom-color: var(--gold);
-  }
-
-  /* ── MAIN LAYOUT ── */
-  main {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem 6rem;
-  }
-
-  /* ── SECTION ── */
-  .lore-section {
-    margin-bottom: 5rem;
-  }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 1.2rem;
-    margin-bottom: 2.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--gold-dim);
-  }
-
-  .section-icon {
-    font-size: 1.8rem;
-    flex-shrink: 0;
-    filter: drop-shadow(0 0 8px #c9a84c44);
-  }
-
-  .section-header h2 {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(1.3rem, 3vw, 1.9rem);
-    font-weight: 400;
-    color: var(--gold);
-    text-shadow: 0 0 30px #c9a84c33;
-    letter-spacing: 0.04em;
-  }
-
-  /* ── CARDS ── */
-  .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .lore-card {
-    background: linear-gradient(145deg, #1e180e, #16110a);
-    border: 1px solid #c9a84c33;
-    border-radius: 4px;
-    padding: 1.6rem 1.8rem;
-    position: relative;
-    transition: border-color 0.25s, transform 0.2s;
-    cursor: pointer;
-    overflow: hidden;
-  }
-
-  .lore-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
-    opacity: 0;
-    transition: opacity 0.25s;
-  }
-
-  .lore-card:hover {
-    border-color: var(--gold-dim);
-    transform: translateY(-2px);
-  }
-
-  .lore-card:hover::before { opacity: 1; }
-
-  .card-tag {
-    display: inline-block;
-    font-family: 'Cinzel', serif;
-    font-size: 0.65rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-    background: #c9a84c14;
-    border: 1px solid #c9a84c33;
-    border-radius: 2px;
-    padding: 0.15rem 0.6rem;
-    margin-bottom: 0.8rem;
-  }
-
-  .lore-card h3 {
-    font-family: 'Cinzel', serif;
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: var(--gold-light);
-    margin-bottom: 0.65rem;
-    line-height: 1.3;
-  }
-
-  .lore-card p {
-    font-size: 0.95rem;
-    color: #c9a84c88;
-    line-height: 1.65;
-    font-style: italic;
-  }
-
-  .card-divider {
-    height: 1px;
-    background: linear-gradient(to right, transparent, #c9a84c22, transparent);
-    margin: 0.9rem 0;
-  }
-
-  .card-body {
-    font-size: 0.92rem;
-    color: #d4bc8acc;
-    line-height: 1.7;
-    font-style: normal;
-  }
-
-  /* ── TIMELINE ── */
-  .timeline {
-    position: relative;
-    padding-left: 2rem;
-  }
-
-  .timeline::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 1px;
-    background: linear-gradient(to bottom, transparent, var(--gold-dim) 10%, var(--gold-dim) 90%, transparent);
-  }
-
-  .timeline-event {
-    position: relative;
-    margin-bottom: 2.5rem;
-    padding-left: 1.5rem;
-  }
-
-  .timeline-event::before {
-    content: '';
-    position: absolute;
-    left: -2rem;
-    top: 0.45rem;
-    width: 9px; height: 9px;
-    border-radius: 50%;
-    background: var(--gold-dim);
-    border: 2px solid #1a1208;
-    box-shadow: 0 0 8px #c9a84c66;
-  }
-
-  .timeline-era {
-    font-family: 'Cinzel', serif;
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-    margin-bottom: 0.25rem;
-  }
-
-  .timeline-event h3 {
-    font-family: 'Cinzel', serif;
-    font-size: 1.05rem;
-    color: var(--gold-light);
-    margin-bottom: 0.4rem;
-  }
-
-  .timeline-event p {
-    font-size: 0.95rem;
-    color: #d4bc8acc;
-    max-width: 700px;
-  }
-
-  /* ── NPC CARDS ── */
-  .npc-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .npc-card {
-    background: #16110a;
-    border: 1px solid #c9a84c22;
-    border-radius: 4px;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.7rem;
-    transition: border-color 0.25s, transform 0.2s;
-  }
-  .npc-card:hover {
-    border-color: var(--gold-dim);
-    transform: translateY(-2px);
-  }
-
-  .npc-avatar {
-    width: 56px; height: 56px;
-    border-radius: 50%;
-    border: 1px solid var(--gold-dim);
-    background: #2a1f0e;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Cinzel', serif;
-    font-size: 1.2rem;
-    color: var(--gold);
-    flex-shrink: 0;
-    margin-bottom: 0.3rem;
-  }
-
-  .npc-card h3 {
-    font-family: 'Cinzel', serif;
-    font-size: 1.05rem;
-    color: var(--gold-light);
-    line-height: 1.3;
-  }
-
-  .npc-role {
-    font-family: 'Crimson Pro', serif;
-    font-style: italic;
-    font-size: 0.9rem;
-    color: var(--gold-dim);
-  }
-
-  .npc-card p {
-    font-size: 0.9rem;
-    color: #d4bc8acc;
-    line-height: 1.65;
-  }
-
-  .npc-status {
-    display: inline-block;
-    font-family: 'Cinzel', serif;
-    font-size: 0.62rem;
-    letter-spacing: 0.15em;
-    padding: 0.1rem 0.55rem;
-    border-radius: 2px;
-    margin-top: auto;
-    align-self: flex-start;
-  }
-  .npc-status.ally { background: #0e2d1a; color: #4a9e6a; border: 1px solid #2a5e3a; }
-  .npc-status.neutral { background: #2a220a; color: #c9a84c; border: 1px solid #5a4a20; }
-  .npc-status.hostile { background: #2d0e0e; color: #b84040; border: 1px solid #5e2a2a; }
-
-  /* ── ARTIFACT CARDS ── */
-  .artifact-card {
-    background: #16110a;
-    border: 1px solid #c9a84c22;
-    border-radius: 4px;
-    padding: 1.6rem 1.8rem;
-    display: grid;
-    grid-template-columns: 3.5rem 1fr;
-    gap: 1.2rem;
-    align-items: start;
-    transition: border-color 0.25s;
-  }
-  .artifact-card:hover { border-color: var(--gold-dim); }
-
-  .artifact-glyph {
-    width: 3.5rem; height: 3.5rem;
-    border: 1px solid var(--gold-dim);
-    border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.6rem;
-    background: #2a1f0e;
-    flex-shrink: 0;
-  }
-
-  .artifact-card h3 {
-    font-family: 'Cinzel', serif;
-    font-size: 1.05rem;
-    color: var(--gold-light);
-    margin-bottom: 0.25rem;
-  }
-
-  .artifact-rarity {
-    font-family: 'Cinzel', serif;
-    font-size: 0.62rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
-    display: inline-block;
-  }
-  .rarity-legendary { color: #e87c2a; }
-  .rarity-rare      { color: #6a9ce8; }
-  .rarity-uncommon  { color: #5aad6e; }
-
-  .artifact-card p {
-    font-size: 0.9rem;
-    color: #d4bc8acc;
-    line-height: 1.65;
-  }
-
-  /* ── FOOTER ── */
-  footer {
-    text-align: center;
-    padding: 2.5rem 1rem;
-    border-top: 1px solid #c9a84c22;
-    font-family: 'Cinzel', serif;
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    color: var(--gold-dim);
-    opacity: 0.6;
-  }
-
-  /* ── EDIT BANNER ── */
-  .edit-note {
-    background: #c9a84c11;
-    border: 1px dashed #c9a84c33;
-    border-radius: 4px;
-    padding: 0.8rem 1.2rem;
-    font-family: 'Cinzel', serif;
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    color: var(--gold-dim);
-    text-align: center;
-    margin-bottom: 3rem;
-  }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 600px) {
-    nav ul li a { padding: 0.7rem 0.8rem; font-size: 0.68rem; }
-    .card-grid, .npc-grid { grid-template-columns: 1fr; }
-    .artifact-card { grid-template-columns: 1fr; }
-  }
-</style>
+    @media (max-width: 600px) {
+      nav ul li a { padding: 0.7rem 0.8rem; font-size: 0.68rem; }
+      .card-grid, .npc-grid { grid-template-columns: 1fr; }
+      .artifact-card { grid-template-columns: 1fr; }
+      .modal-meta-grid { grid-template-columns: 1fr; }
+      .modal-inner { padding: 1.4rem 1.4rem 1.8rem; }
+    }
+  </style>
 </head>
 <body>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal" id="modal">
+    <div class="modal-top-rule"></div>
+    <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+    <div class="modal-inner" id="modal-inner"></div>
+  </div>
+</div>
 
 <header>
   <div class="header-ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
   <h1>Xohos</h1>
-  <p class="world-subtitle">Lore Compendium &amp; Chronicle</p>
+  <p class="world-subtitle">Lore Kompendium &amp; Krønikler</p>
   <div class="header-rule">✦</div>
   <p class="tagline">All that was, all that is, and all that yet may be.</p>
 </header>
 
 <nav>
   <ul>
-    <li><a href="#history">History</a></li>
-    <li><a href="#factions">Factions</a></li>
-    <li><a href="#locations">Locations</a></li>
-    <li><a href="#npcs">Notable NPCs</a></li>
-    <li><a href="#artifacts">Magic &amp; Artifacts</a></li>
+    <li><a href="#history">Historie</a></li>
+    <li><a href="#factions">Faksjoner</a></li>
+    <li><a href="#locations">Steder</a></li>
+    <li><a href="#npcs">Viktige NPC-er</a></li>
+    <li><a href="#artifacts">Magi &amp; Items</a></li>
   </ul>
 </nav>
 
 <main>
 
-  <div class="edit-note">
-    ✦ &nbsp; Replace placeholder text with your own lore — each card is easy to copy &amp; extend &nbsp; ✦
-  </div>
 
-  <!-- ──────────────── HISTORY ──────────────── -->
+  <!-- HISTORY -->
   <section class="lore-section" id="history">
-    <div class="section-header">
-      <span class="section-icon">📜</span>
-      <h2>History &amp; Timeline</h2>
-    </div>
-
+    <div class="section-header"><span class="section-icon">📜</span><h2>Historie &amp; Tidslinje</h2></div>
     <div class="timeline">
-
-      <div class="timeline-event">
+      <div class="timeline-event" onclick="openModal('history','sundering')">
         <div class="timeline-era">Begynnelsen &nbsp;·&nbsp; År 0</div>
-        <h3>Xohos' fødsel</h3>
+        <h3>Xohos' Fødsel</h3>
         <p>Verdenen Ethana ble skapt for om lag 12 tusen år siden som et resultat av 3 guder som kjempet mot hverandre om retten til dette hjørnet av universet. Resultatet ble en planet fyllt med vann, øyer og kontinenter. De største er Xohos, Falkerta og Klarik. Ingen vet nøyaktig når livet på Xohos begynte, men de eldste helleristingene viser at de naturlige fjellkjedene delte kontinentet i to befolkningsgrupper. Disse to ble rikene Flimt og Otrava</p>
       </div>
-
-      <div class="timeline-event">
-        <div class="timeline-era">Sølvalderen &nbsp;·&nbsp; År 1058 </div>
-        <h3>Tarrasquekrigen</h3>
+      <div class="timeline-event" onclick="openModal('history','ember-throne')">
+        <div class="timeline-era">Sølvalderen &nbsp;·&nbsp; Omlag År 8000</div>
+        <h3>Tarrasquekrigene</h3>
         <p>Legendene forteller om den store tarrasquekrigen, en krig mellom menneske og tarrasquene som brakte ødeleggelse og kaos til hele kontinentet. I deres mørkeste time ble dragene blandet inn, og en allianse mellom drager og mennesker ble til for å få slutt på grusomhetene.
           Krigen skal ha blitt avsluttet da de mektigste dragene og trollmennene skapte det magiske “Dragesepteret”, et septer som skal ha gitt brukeren muligheten til å styre drager, og skape demi-plan der de sendte de gjenværende tarrasquene.</p>
       </div>
-
-      <div class="timeline-event">
-        <div class="timeline-era">Gullalderen &nbsp;·&nbsp; År  3712</div>
-        <h3>Vår tid</h3>
-        <p> Siden Tarrasquekrigen har Flimt og Otrava vært forent til ett rike, Xohos. De har nytt godt av den langvarige freden, er har hatt en fremvekst og utvikling sterkere enn de andre kontinentene. Likevel har det i det siste vært noe som lusker i skyggene...</p>
+      <div class="timeline-event" onclick="openModal('history','stirring')">
+        <div class="timeline-era">Vår Tid &nbsp;·&nbsp; År 11,892</div>
+        <h3>Mørket Våkner</h3>
+        <p>Siden Tarrasquekrigen har Flimt og Otrava vært forent til ett rike, Xohos. De har nytt godt av den langvarige freden, er har hatt en fremvekst og utvikling sterkere enn de andre kontinentene. Likevel har det i det siste vært noe som lusker i skyggene...</p>
       </div>
-
     </div>
   </section>
 
-  <!-- ──────────────── FACTIONS ──────────────── -->
+  <!-- FACTIONS -->
   <section class="lore-section" id="factions">
-    <div class="section-header">
-      <span class="section-icon">⚔️</span>
-      <h2>Faksjoner &amp; Organisasjoner</h2>
-    </div>
-
+    <div class="section-header"><span class="section-icon">⚔️</span><h2>Faksjoner &amp; Organisasjoner</h2></div>
     <div class="card-grid">
-
-      <div class="lore-card">
-        <div class="card-tag">Militant Orden</div>
-        <h3>Eventyrlauget</h3>
-        <p><em>"From ruin, we rebuild."</em></p>
-        <div class="card-divider"></div>
-        <div class="card-body">Lauget er et av de eldste i Xohos, så lenge det har vært befolkning har det også vært behov for eventyrere. De er respektert i samfunnet, </div>
+      <div class="lore-card" onclick="openModal('faction','eventyrlauget')">
+        <div class="card-tag">Militant Laug</div><h3>Eventyrlauget</h3>
+        <p>"Eventyret er der ute"</p><div class="card-divider"></div>
+        <div class="card-body">Eventyrlauget er et av de eldste i Xohos, for så lenge det har vært befolkning har det også vært behov for eventyrere. De er respektert i samfunnet, og utfører oppdrag på alle mulige nivåer</div>
+        <span class="card-read-more">Les Mer →</span>
       </div>
-
-      <div class="lore-card">
-        <div class="card-tag">De drikkeglades laug</div>
-        <h3>Alkymistlauget</h3>
-        <p><em>"All knowledge belongs to the world."</em></p>
-        <div class="card-divider"></div>
-        <div class="card-body">A network of librarians, cartographers, and sages who trade in secrets as readily as coin. They hold libraries in every major city — and hidden vaults in several that are not on any map.</div>
+      <div class="lore-card" onclick="openModal('faction','alkymistlauget')">
+        <div class="card-tag">Forskning og Handels-laug</div><h3>Alkymistlauget</h3>
+        <p>"Det finnes ikke en flaske det ikke kan skåles fra!"</p><div class="card-divider"></div>
+        <div class="card-body">Alkymistlauget er en av grunnstene i Xohos. Lauget har to hovedavdelinger: en forskningsavdeling og en handelsavdeling</div>
+        <span class="card-read-more">Les mer →</span>
       </div>
-
-      <div class="lore-card">
-        <div class="card-tag">Criminal Syndicate</div>
-        <h3>Gråskjortene</h3>
-        <p><em>"Pull the right strings."</em></p>
-        <div class="card-divider"></div>
-        <div class="card-body">An invisible hand in every major city's underworld. No one knows who leads them. No one who claims to knows for long. They deal in rare goods, information, and favours — always with interest.</div>
+      <div class="lore-card" onclick="openModal('faction','graskjortene')">
+        <div class="card-tag">Hellige Fanatikere</div><h3>Gråskjortene</h3>
+        <p>"De usmertede skal renses!"</p><div class="card-divider"></div>
+        <div class="card-body">Gråskjortene er en religiøs bevegelse som har økt kraftig de siste årene. De tilber guden av lidelse, Ilmater</div>
+        <span class="card-read-more">Les mer →</span>
       </div>
-
-      <div class="lore-card">
-        <div class="card-tag">Religious Covenant</div>
-        <h3>Tarrasquens barn</h3>
-        <p><em>"What sleeps shall rise."</em></p>
-        <div class="card-divider"></div>
-        <div class="card-body">Worshippers of the old gods who were cast down in the First Age. Considered heretics by the dominant faith. Their rituals take place at the boundary of day and night, in places the sun cannot reach.</div>
+      <div class="lore-card" onclick="openModal('faction','tarrasquens-barn')">
+        <div class="card-tag">Religiøs Kult</div><h3>Tarrasquens barn</h3>
+        <p>"De sovende skal komme tilbake"</p><div class="card-divider"></div>
+        <div class="card-body">Tilbedere av Tarrasquene, og opperer som en urban myte som smyger i mørket. De ønsker å bringe tarrasquene tilbake til Xohos, har har blitt lovet uendelig makt i bytte.</div>
+        <span class="card-read-more">Les mer →</span>
       </div>
-
+      <div class="lore-card" onclick="openModal('faction','hellige-akkord')">
+        <div class="card-tag">Hemmelig Orden</div><h3>Den Hellige/Gyldne Akkord</h3>
+        <p>"Sangen som aldri ender"</p><div class="card-divider"></div>
+        <div class="card-body">En hemmelig orden, dedikert til å holde Gimlekvadet trygt.</div>
+        <span class="card-read-more">Les mer →</span>
+      </div>
     </div>
   </section>
 
-  <!-- ──────────────── LOCATIONS ──────────────── -->
+  <!-- LOCATIONS -->
   <section class="lore-section" id="locations">
-    <div class="section-header">
-      <span class="section-icon">🗺️</span>
-      <h2>Locations &amp; Places</h2>
-    </div>
-
+    <div class="section-header"><span class="section-icon">🗺️</span><h2>Steder &amp; Byer</h2></div>
+    <div id="world-map"></div>
     <div class="card-grid">
-
-      <div class="lore-card">
-        <div class="card-tag">City &nbsp;·&nbsp; Seat of Power</div>
-        <h3>Tasburg, Den gyldne by</h3>
-        <p><em>Befolkning: ~180,000.</em></p>
-        <div class="card-divider"></div>
-        <div class="card-body">Built upon the ruins of the old empire, Vaelthar is a city of layered contradictions — marble spires over crumbling catacombs, merchant feasts beside gutter markets. Its politics are as treacherous as its sewers.</div>
+      <div class="lore-card" onclick="openModal('location','tasburg')">
+        <div class="card-tag">Hovedstaden</div><h3>Tasburg</h3>
+        <p>Populasjon ~80,000 · Alle veier leder hit.</p><div class="card-divider"></div>
+        <div class="card-body">Tasburg er Xohos største og mest befolkede by, med Krassslottet i midten som byens perle. Der bor Loxodonen Kong Brodar, kongen av Xohos.</div>
+        <span class="card-read-more">Les mer →</span>
       </div>
-
-      <div class="lore-card">
-        <div class="card-tag">Wilderness &nbsp;·&nbsp; Dangerous</div>
-        <h3>Poyos</h3>
-        <p><em>Southeastern lowlands. Avoid at night.</em></p>
-        <div class="card-divider"></div>
-        <div class="card-body">A vast stretch of grey water and rotting wood where the ground cannot be trusted. Strange lights drift between the reeds after sundown. Locals say the dead of the Sundering never left.</div>
+      <div class="lore-card" onclick="openModal('location','vlada')">
+        <div class="card-tag">Kuldens hjem</div><h3>Vlada</h3>
+        <p>Populasjon ~35,000 · Vokternes by.</p><div class="card-divider"></div>
+        <div class="card-body">Vlada ligger i det kalde og øde høyfjellet, midt i Xohos. Byen er fanget i en evig vinter, noe som har satt spor i lokalbefolkningen. </div>
+        <span class="card-read-more">LEs mer →</span>
       </div>
-
-      <div class="lore-card">
-        <div class="card-tag">Ruin &nbsp;·&nbsp; Contested</div>
-        <h3>Abral</h3>
-        <p><em>Northern highlands. Origin unknown.</em></p>
-        <div class="card-divider"></div>
-        <div class="card-body">No historian agrees on who built it or why it broke. The citadel's stones float at impossible angles, frozen mid-collapse for a thousand years. Three expeditions have attempted to enter. One returned.</div>
+      <div class="lore-card" onclick="openModal('location','nung')">
+        <div class="card-tag">Trolldommens hjem</div><h3>Nung</h3>
+        <p>Populasjon ~60,000 · Magiens by.</p><div class="card-divider"></div>
+        <div class="card-body">En av Xohos' eldste byer, og der magi hadde sin begynnelse på kontinentet. Idag ligger trolldomsskolen Frøns-Instittutet i sentrum, og tiltrekker tusenvis av unge magikere hvert år.</div>
+        <span class="card-read-more">Les mer →</span>
       </div>
-
-      <div class="lore-card">
-        <div class="card-tag">Settlement &nbsp;·&nbsp; Hidden</div>
-        <h3>Nung</h3>
-        <p><em>Subterranean. Exact location unknown to outsiders.</em></p>
-        <div class="card-divider"></div>
-        <div class="card-body">A sprawling underground town carved into geothermal caverns. Home to those who cannot survive above ground — refugees, outlaws, and those who simply prefer the dark. It has no official leaders. It has very strong opinions.</div>
+      <div class="lore-card" onclick="openModal('location','sporan')">
+        <div class="card-tag">En perle for det skjulte </div><h3>Sporan</h3>
+        <p>Populasjon ~450 · For fellesskapets beste</p><div class="card-divider"></div>
+        <div class="card-body">Sporan er landsbyen tiden glemte. Det er et knutepunkt for handel rundt på kontinentet, og bringer med seg mange intressante varer og personer.</div>
+        <span class="card-read-more">Les mer →</span>
       </div>
-
-      <div class="lore-card">
-        <div class="card-tag">Settlement &nbsp;·&nbsp; Hidden</div>
-        <h3>Sporan</h3>
-        <p><em>Subterranean. Exact location unknown to outsiders.</em></p>
-        <div class="card-divider"></div>
-        <div class="card-body">A sprawling underground town carved into geothermal caverns. Home to those who cannot survive above ground — refugees, outlaws, and those who simply prefer the dark. It has no official leaders. It has very strong opinions.</div>
+      <div class="lore-card" onclick="openModal('location','poyos')">
+        <div class="card-tag">Fisk, fyr og flyndre </div><h3>Poyos</h3>
+        <p>Populasjon ~1250 · Havets beboere</p><div class="card-divider"></div>
+        <div class="card-body">Poyos er en utkantsbygd ved Falkerhavet. På kanten av de høye klippene har innbyggerne måttet tilpasse seg naturen, og de utviser stor respekt for den. </div>
+        <span class="card-read-more">Les mer →</span>
       </div>
-
+      <div class="lore-card" onclick="openModal('location','pria')">
+        <div class="card-tag">Handel og underverden </div><h3>Pria</h3>
+        <p>Populasjon ~2500 · Handelsbyen</p><div class="card-divider"></div>
+        <div class="card-body">Pria er bygget på en gammel garnisone fra oldtiden. Den er idag et strategisk møtepunkt for reisende med sine mange reiseveier. </div>
+        <span class="card-read-more">Les mer →</span>
+      </div>
     </div>
   </section>
 
-  <!-- ──────────────── NPCs ──────────────── -->
+  <!-- NPCS -->
   <section class="lore-section" id="npcs">
-    <div class="section-header">
-      <span class="section-icon">👤</span>
-      <h2>Notable NPCs</h2>
-    </div>
-
+    <div class="section-header"><span class="section-icon">👤</span><h2>Viktige NPC-er</h2></div>
     <div class="npc-grid">
-
-      <div class="npc-card">
-        <div class="npc-avatar">ME</div>
-        <h3>Maurice Elvalds</h3>
-        <div class="npc-role">Legendarisk Bard</div>
+      <div class="npc-card" onclick="openModal('npc','eryndra')">
+        <div class="npc-avatar">EM</div><h3>Eryndra Mael</h3>
+        <div class="npc-role">Archmage of the Verdant Archive</div>
         <p>Appears to be in her fifties. Has not visibly aged in forty years. Speaks in questions. Knows more than she lets on — which is to say, everything.</p>
-        <span class="npc-status hostile">Hostile</span>
-      </div>
-
-      <div class="npc-card">
-        <div class="npc-avatar">ZK</div>
-        <h3>Zvalda Kirtos</h3>
-        <div class="npc-role">Kommandør, Eventyrlauget</div>
-        <p>A dwarf who lost his entire unit during the siege of Vaelthar's east gate. He blames the city council. The city council is afraid he might be right.</p>
         <span class="npc-status ally">Ally (tentative)</span>
       </div>
-
-      <div class="npc-card">
-        <div class="npc-avatar">SS</div>
-        <h3>The Smiling Stranger</h3>
+      <div class="npc-card" onclick="openModal('npc','borin')">
+        <div class="npc-avatar">BK</div><h3>Borin Keld</h3>
+        <div class="npc-role">Commander, Ashen Vanguard</div>
+        <p>A dwarf who lost his entire unit during the siege of Vaelthar's east gate. He blames the city council.</p>
+        <span class="npc-status neutral">Neutral</span>
+      </div>
+      <div class="npc-card" onclick="openModal('npc','stranger')">
+        <div class="npc-avatar">SS</div><h3>The Smiling Stranger</h3>
         <div class="npc-role">Unknown affiliation</div>
         <p>Appears in different cities under different names. Always smiling. Always watching. Has helped the party twice — and hindered them once, seemingly for fun.</p>
         <span class="npc-status neutral">Unknown</span>
       </div>
-
-      <div class="npc-card">
-        <div class="npc-avatar">VR</div>
-        <h3>Vasha Rel</h3>
+      <div class="npc-card" onclick="openModal('npc','vasha')">
+        <div class="npc-avatar">VR</div><h3>Vasha Rel</h3>
         <div class="npc-role">High Votary, Dusk Covenant</div>
-        <p>Charismatic, soft-spoken, and utterly sincere in beliefs the party finds unsettling. She does not consider herself a villain. Neither do most of her followers.</p>
+        <p>Charismatic, soft-spoken, and utterly sincere in beliefs the party finds unsettling. She does not consider herself a villain.</p>
         <span class="npc-status hostile">Hostile</span>
       </div>
-
     </div>
   </section>
 
-  <!-- ──────────────── ARTIFACTS ──────────────── -->
+  <!-- ARTIFACTS -->
   <section class="lore-section" id="artifacts">
-    <div class="section-header">
-      <span class="section-icon">✨</span>
-      <h2>Magic &amp; Artifacts</h2>
-    </div>
-
+    <div class="section-header"><span class="section-icon">✨</span><h2>Magic &amp; Artifacts</h2></div>
     <div class="card-grid">
-
-      <div class="lore-card artifact-card">
+      <div class="lore-card artifact-card" onclick="openModal('artifact','hollow-crown')">
         <div class="artifact-glyph">🔮</div>
-        <div>
-          <h3></h3>
-          <span class="artifact-rarity rarity-legendary">◆ Legendary</span>
-          <p>A crown of black iron with no gemstones — only empty settings where stones once sat. Wearing it is said to grant the voice of a god and the hunger of one, too.</p>
-        </div>
+        <div><h3>The Hollow Crown</h3><span class="artifact-rarity rarity-legendary">◆ Legendary</span>
+          <p>A crown of black iron with empty settings where stones once sat. Wearing it grants the voice of a god — and the hunger of one.</p>
+          <span class="card-read-more">Read more →</span></div>
       </div>
-
-      <div class="lore-card artifact-card">
+      <div class="lore-card artifact-card" onclick="openModal('artifact','ember-codex')">
         <div class="artifact-glyph">📖</div>
-        <div>
-          <h3>The Ember Codex</h3>
-          <span class="artifact-rarity rarity-rare">◆ Rare</span>
-          <p>A spellbook that writes itself when left in firelight. The spells it records are not always the ones it was left beside. Its previous owner died of curiosity.</p>
-        </div>
+        <div><h3>The Ember Codex</h3><span class="artifact-rarity rarity-rare">◆ Rare</span>
+          <p>A spellbook that writes itself when left in firelight. Its previous owner died of curiosity.</p>
+          <span class="card-read-more">Read more →</span></div>
       </div>
-
-      <div class="lore-card artifact-card">
+      <div class="lore-card artifact-card" onclick="openModal('artifact','quiet-blade')">
         <div class="artifact-glyph">🗡️</div>
-        <div>
-          <h3>Velanthas, the Quiet Blade</h3>
-          <span class="artifact-rarity rarity-rare">◆ Rare</span>
-          <p>A shortsword that makes no sound when drawn or used. Neither do those it strikes, for three agonising seconds. Highly sought after. Difficult to find a willing seller.</p>
-        </div>
+        <div><h3>Velanthas, the Quiet Blade</h3><span class="artifact-rarity rarity-rare">◆ Rare</span>
+          <p>A shortsword that makes no sound when drawn. Neither do those it strikes, for three agonising seconds.</p>
+          <span class="card-read-more">Read more →</span></div>
       </div>
-
-      <div class="lore-card artifact-card">
+      <div class="lore-card artifact-card" onclick="openModal('artifact','wayward-compass')">
         <div class="artifact-glyph">🧭</div>
-        <div>
-          <h3>Hjerterom (basen)</h3>
-          <span class="artifact-rarity rarity-uncommon">◆ Uncommon</span>
-          <p>Points not north, but toward whatever the holder most wants — or most fears, depending on the moon. A useful tool, if you trust yourself. Most people shouldn't.</p>
-        </div>
+        <div><h3>The Wayward Compass</h3><span class="artifact-rarity rarity-uncommon">◆ Uncommon</span>
+          <p>Points toward what the holder most wants — or most fears, depending on the moon.</p>
+          <span class="card-read-more">Read more →</span></div>
       </div>
-
     </div>
   </section>
-
 </main>
 
-<footer>
-  ✦ &nbsp; Xohos krønikerene &nbsp; ✦ &nbsp; All lore is subject to change at the DM's discretion &nbsp; ✦
-</footer>
+<footer>✦ &nbsp; Krønikerne om Xohos &nbsp; ✦ &nbsp; All lore is subject to change at the DM's discretion &nbsp; ✦</footer>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // ═══════════════════════════════════════════
+  //  LORE DATA — edit this to update everything
+  // ═══════════════════════════════════════════
+  const LORE = {
+    history: {
+      sundering: {
+        tag: 'The First Age · Year 0', title: 'The Sundering', subtitle: 'The cataclysm that remade the world',
+        body: `<p>No mortal alive witnessed the Sundering, yet every culture on the continent keeps its own account. In the Vaelthari telling, the god Varek split the earth to punish mortals for their arrogance. In the northern rites, it was a war between celestial titans whose battle simply spilled over into the physical plane. The Dusk Covenant holds that a god was deliberately killed, and the world shook with grief.</p>
+<p>What is agreed upon: in Year 0 of the First Age, the landmass now called the Fractured Reach was once a single continent. Over the course of seven days and seven nights, it broke apart along fault lines that follow no geological logic. Seas rushed in. Mountains fell. Some regions simply ceased to exist.</p>
+<p>The twin moons — Aethis and her smaller companion Vel — are said to have changed their paths in the sky that week and have not returned to their prior courses since.</p>`,
+        meta: [{ label: 'Era', value: 'First Age' }, { label: 'Year', value: '0' }, { label: 'Duration', value: '7 days' }, { label: 'Status', value: 'Mythologized' }]
+      },
+      'ember-throne': {
+        tag: 'The Second Age · Year 430', title: 'Rise of the Ember Throne', subtitle: 'The only empire to unite the known world',
+        body: `<p>Four centuries after the Sundering, a warlord named Serath Vael united the warring city-states under a single banner — the Ember Throne, a seat of black volcanic glass said to burn cold to the touch of the righteous and scalding to the corrupt.</p>
+<p>The empire at its height stretched from the Ashfen Coast in the southeast to the Frostpeak Mountains in the north. Its roads still exist; its border markers are still dug up by farmers. It lasted two hundred and twelve years before collapsing under the weight of succession wars, plague, and an insurgency some historians believe was funded by what would eventually become the Silver Thread.</p>
+<p>The Ember Throne itself vanished in Year 642. No one has ever credibly claimed to have found it.</p>`,
+        meta: [{ label: 'Era', value: 'Second Age' }, { label: 'Founded', value: 'Year 430' }, { label: 'Fell', value: 'Year 642' }, { label: 'Founder', value: 'Serath Vael' }]
+      },
+      'long-silence': {
+        tag: 'The Third Age · Year 712', title: 'The Long Silence', subtitle: 'Three generations without magic',
+        body: `<p>Beginning in Year 712 and lasting until approximately Year 810, magic simply stopped working. Spells fizzled. Divine prayers went unanswered. Ley lines — the invisible channels of arcane energy that crisscross the world — went cold and dark.</p>
+<p>No cause has ever been definitively identified. The Verdant Archive's official position is that the Silence was a natural tidal event, like a magical winter. The Dusk Covenant maintains it was divine punishment for the destruction of the Ember Throne. A minority of scholars believe it was intentional — that someone, somewhere, pulled a very large lever.</p>
+<p>Magic returned gradually, like sensation returning to a sleeping limb. Some spells that existed before the Silence have never worked again.</p>`,
+        meta: [{ label: 'Era', value: 'Third Age' }, { label: 'Began', value: 'Year 712' }, { label: 'Ended', value: 'c. Year 810' }, { label: 'Cause', value: 'Unknown' }]
+      },
+      stirring: {
+        tag: 'Present Day · Year 1,089', title: 'The Stirring', subtitle: 'The age the players inherit',
+        body: `<p>Something is waking up. Scholars in the Verdant Archive began cataloguing anomalies three years ago: wards that held for centuries suddenly failing, creatures emerging from deep places, and a recurring aurora visible only on moonless nights that matches no known celestial model.</p>
+<p>The Ashen Vanguard has quietly tripled its recruitment. The Dusk Covenant has grown bolder, holding open rituals in cities where they previously operated only in secret. And in the marketplaces, a rumour persists that someone has found the Ember Throne.</p>
+<p>Into this world, the players arrive. Whether they are seeking fortune, answers, redemption, or simply a hot meal, the world has a way of finding uses for people who refuse to look away.</p>`,
+        meta: [{ label: 'Era', value: 'Fourth Age (disputed)' }, { label: 'Year', value: '1,089' }, { label: 'Threat level', value: 'Escalating' }, { label: 'Campaign start', value: 'Here' }]
+      }
+    },
+    faction: {
+      'ashen-vanguard': {
+        tag: 'Militant Order', title: 'The Ashen Vanguard', subtitle: '"From ruin, we rebuild."',
+        body: `<p>Founded in the aftermath of the Ember Throne's collapse, the Ashen Vanguard began as a peacekeeping force tasked with preventing warlords from filling the power vacuum. Over the centuries they have evolved — or, critics would say, mutated — into something considerably more autonomous.</p>
+<p>They answer to no single nation, though most nations prefer not to say so loudly. Their funding comes from a network of noble houses who remember the chaos of Year 642 and would very much prefer not to repeat it. Their methods are effective and rarely gentle.</p>
+<p>The Vanguard maintains a strict internal hierarchy. At the top sits the Conclave of Seven, whose identities are never publicly disclosed. Below them are Marshals, then Wardens, then the rank-and-file Sentinels. Promotion is meritocratic in theory; in practice, surviving long enough tends to handle the selection process.</p>`,
+        meta: [{ label: 'Founded', value: 'c. Year 650' }, { label: 'Alignment', value: 'Lawful (self-defined)' }, { label: 'Headquarters', value: 'Unknown' }, { label: 'Disposition', value: 'Wary ally' }]
+      },
+      'verdant-archive': {
+        tag: 'Scholarly Guild', title: 'The Verdant Archive', subtitle: '"All knowledge belongs to the world."',
+        body: `<p>The Verdant Archive maintains libraries in every major city — open to the public, free of charge, which is how they want you to think about them. For every public reading room, there is a locked vault below it. For every friendly archivist, there is a field agent who hasn't been in a library in years.</p>
+<p>The Archive trades in information. They barter knowledge for knowledge, and the ledger of what they know versus what they share is deeply asymmetrical.</p>
+<p>Their scholars are genuinely passionate about preservation and learning. Their administrators are genuinely passionate about leverage. These two groups coexist in a state of productive tension that has lasted for four centuries. Membership is by invitation only, extended to people who know something worth knowing.</p>`,
+        meta: [{ label: 'Founded', value: 'Year 701' }, { label: 'Alignment', value: 'Neutral' }, { label: 'Headquarters', value: 'Vaelthar (public)' }, { label: 'Disposition', value: 'Transactional' }]
+      },
+      'silver-thread': {
+        tag: 'Criminal Syndicate', title: 'The Silver Thread', subtitle: '"Pull the right strings."',
+        body: `<p>Nobody founded the Silver Thread. That is the official position of everyone who has ever been credibly linked to it. The Thread operates as a network rather than a hierarchy — cells that know each other only by hand signals and coded phrases, with no single point of failure and no ledger that could incriminate leadership.</p>
+<p>What the Thread does is move things. Goods that can't legally cross borders. Information that shouldn't be written down. People who need to disappear in one place and reappear in another. They charge accordingly, and they always deliver — reliability is their most valuable asset, and they protect it aggressively.</p>
+<p>Working against them is inadvisable. Problems that arise from breaches of contract tend to resolve themselves in the Thread's favour, in ways that are difficult to trace.</p>`,
+        meta: [{ label: 'Founded', value: 'Unknown' }, { label: 'Alignment', value: 'Neutral (commercial)' }, { label: 'Headquarters', value: 'None confirmed' }, { label: 'Disposition', value: 'Mercenary' }]
+      },
+      'dusk-covenant': {
+        tag: 'Religious Covenant', title: 'The Dusk Covenant', subtitle: '"What sleeps shall rise."',
+        body: `<p>The dominant faith holds that the gods of the First Age were rightly cast down. The Dusk Covenant disagrees. Their theology holds that the old gods were not destroyed but merely imprisoned — sleeping beneath the world's roots, waiting. The Covenant's purpose is to hasten their return, one prayer at a time.</p>
+<p>They are not stupid about it. For most of their history they operated in careful secrecy, accumulating influence slowly. In the last three years they have grown noticeably bolder, which either means they believe the end is near or they know something others don't.</p>
+<p>High Votary Vasha Rel presents a public face of philosophical curiosity and compassionate community. Those who attend her open lectures leave feeling thoughtful and slightly uncertain of their prior assumptions. This is entirely intentional.</p>`,
+        meta: [{ label: 'Founded', value: 'Year 14 (First Age)' }, { label: 'Alignment', value: 'Lawful Evil' }, { label: 'Headquarters', value: 'Decentralized' }, { label: 'Disposition', value: 'Hostile' }]
+      }
+    },
+    location: {
+      tasburg: {
+        tag: 'City · Seat of Power', title: 'Vaelthar, the Gilded City', subtitle: 'Population ~80,000 · Crossroads of the known world',
+        body: `<p>Vaelthar is built on a lie — specifically, on the ruins of a previous city that also claimed to be the centre of civilization. The current city has been rebuilt four times in the past millennium, each layer pressing down on the last, so that the oldest streets are now underground tunnels and the oldest buildings are now basements of newer ones.</p>
+<p>The city is governed by a Council of Wardens — nine seats, theoretically elected, practically hereditary, deeply corrupt in ways so entrenched that nobody even bothers to call it corruption anymore. The Ashen Vanguard maintains a garrison here under sufferance. The Silver Thread maintains an operation here under secrecy. The Verdant Archive has a beautiful public library with a very interesting basement.</p>
+<p>The Gilded District in the north is clean, cool, and quiet. The Ashgate slums in the southeast are none of those things. Between them, the rest of the city negotiates its existence.</p>`,
+        meta: [{ label: 'Region', value: 'Central plains' }, { label: 'Population', value: '~80,000' }, { label: 'Government', value: 'Council of Wardens' }, { label: 'Danger level', value: 'Political' }]
+      },
+      vlada: {
+        tag: 'Wilderness · Dangerous', title: 'The Ashfen Marshes', subtitle: 'Southeastern lowlands · Avoid at night',
+        body: `<p>The Ashfen is approximately forty leagues of ground that cannot make up its mind. It is solid enough to walk on until it isn't. The water is dark enough to seem shallow until it's over your head. The paths that locals use shift seasonally, and locals don't share them with strangers.</p>
+<p>The lights are the most frequently reported phenomenon — pale blue-white spheres that drift between the reeds after dark, moving with apparent purpose, occasionally appearing to follow travellers. They are consistently described as beautiful. They have also been consistently associated with disappearances, which may or may not be coincidence.</p>
+<p>Scholars from the Verdant Archive have catalogued at least three distinct humanoid species believed to inhabit the Ashfen's deeper regions, none of which have agreed to be studied. The remains of a pre-Sundering settlement have been found partially submerged in the northern section — what it was called and who built it remain unknown.</p>`,
+        meta: [{ label: 'Region', value: 'Southeast lowlands' }, { label: 'Size', value: '~40 leagues across' }, { label: 'Terrain', value: 'Wetlands, bog' }, { label: 'Danger level', value: 'High' }]
+      },
+      'keth-varun': {
+        tag: 'Ruin · Contested', title: 'Keth Varun, the Shattered Citadel', subtitle: 'Northern highlands · Origin unknown',
+        body: `<p>Keth Varun defies geology. Its stones — massive blocks of a black material that is neither granite nor obsidian nor any rock found on the continent — hang suspended at the angles of an explosion frozen mid-moment. Some float. Not metaphorically. The largest block, roughly the size of a building, rotates slowly above the main ruin at a height of approximately thirty feet. It has been doing this for at least a thousand years.</p>
+<p>Three expeditions are on formal record. The first, sponsored by the Verdant Archive in Year 1,041, returned with nine of its twelve members and a box they refused to open in public. The second, a mercenary operation in Year 1,063, did not return. The third, in Year 1,078, returned with one survivor who has not spoken since.</p>
+<p>The Ashen Vanguard has placed an informal exclusion zone around the site. This is not legally enforceable. People go anyway.</p>`,
+        meta: [{ label: 'Region', value: 'Northern highlands' }, { label: 'Status', value: 'Contested ruin' }, { label: 'Known hazards', value: 'Unknown' }, { label: 'Danger level', value: 'Extreme' }]
+      },
+      underhearth: {
+        tag: 'Settlement · Hidden', title: 'Underhearth', subtitle: 'Subterranean · Location unknown to outsiders',
+        body: `<p>Underhearth exists in the space between official maps. Built into a network of geothermal caverns somewhere beneath the central plains — the exact location is not publicised, and arrivals are typically blindfolded for the last stage of the journey — it houses somewhere between three and eight thousand people depending on the season and the political situation above ground.</p>
+<p>It has no official government. This is not the same as having no order. Underhearth operates through a complex system of neighbourhood councils, trade guild agreements, and the quiet authority of the people who have been there longest. Violence is not forbidden; it is simply understood to be bad for business in a space where everyone needs each other.</p>
+<p>It is a place for people who cannot exist comfortably above ground. Nobody asks where you came from. This is considered a feature.</p>`,
+        meta: [{ label: 'Region', value: 'Subterranean' }, { label: 'Population', value: '3,000–8,000' }, { label: 'Government', value: 'Consensus' }, { label: 'Danger level', value: 'Low (if invited)' }]
+      }
+    },
+    npc: {
+      eryndra: {
+        tag: 'Ally (Tentative)', title: 'Eryndra Mael', subtitle: 'Archmage of the Verdant Archive',
+        body: `<p>Eryndra Mael has held the title of Archmage of the Verdant Archive for forty-three years. She appears to be in her mid-fifties. She has appeared to be in her mid-fifties for at least the last forty years, according to anyone old enough to remember. She does not discuss this.</p>
+<p>She communicates almost entirely in questions — not Socratic questions designed to guide you toward an answer she already has, but genuine questions that seem to be working something out in real time. This unnerves most people she meets, which she considers useful data.</p>
+<p>Eryndra is one of perhaps seven people alive who have read the full contents of the Archive's restricted vaults. She is helpful to the party in the sense that she points them toward things that are useful to her, which sometimes overlaps with things that are useful to them. She has a particular and unexplained interest in the Sundering that makes her briefly, visibly uncomfortable when anyone asks about Year 0 specifically.</p>`,
+        meta: [{ label: 'Race', value: 'Human (apparent)' }, { label: 'Age', value: 'Unknown' }, { label: 'Affiliation', value: 'Verdant Archive' }, { label: 'Disposition', value: 'Ally (tentative)' }]
+      },
+      borin: {
+        tag: 'Neutral', title: 'Borin Keld', subtitle: 'Commander, Ashen Vanguard · Vaelthar garrison',
+        body: `<p>Borin Keld is not a subtle man. He is built like a defensive fortification and communicates with approximately the same warmth. He has been Commander of the Vaelthar garrison for eleven years, a posting he regards as a punishment and that the Vanguard regards as a use of his considerable skills in a place where subtlety would be wasted anyway.</p>
+<p>He lost his entire unit — fourteen Sentinels — during the "suppression action" at Vaelthar's east gate in Year 1,082. He has stated, quite publicly, that the action was ordered with full knowledge that the unit would not return, and that the people who ordered it are still sitting in the Council chambers.</p>
+<p>He is still alive, which suggests either that he is too useful to remove or that the Council is afraid of what he might do next. Possibly both. He respects competence and despises waste, and has a dwarvish understanding of debt — both owed and owning — and keeps careful accounts of both.</p>`,
+        meta: [{ label: 'Race', value: 'Dwarf' }, { label: 'Age', value: 'c. 180' }, { label: 'Affiliation', value: 'Ashen Vanguard' }, { label: 'Disposition', value: 'Neutral' }]
+      },
+      stranger: {
+        tag: 'Unknown', title: 'The Smiling Stranger', subtitle: 'Affiliation unknown · Multiple confirmed identities',
+        body: `<p>The party has encountered this individual three times. On each occasion they have given a different name — Vel Ashran in Vaelthar, Corren Mist at the crossroads inn, and most recently simply "a traveller" — and occupied a different social role. What has remained consistent: the smile, the watchfulness, and the fact that they knew the party was coming before the party arrived.</p>
+<p>They helped the party twice and hindered them once — blocking the road to Keth Varun for eighteen hours with what appeared to be bureaucratic obstruction — with no explanation offered and no apparent motive. They are not frightened by anything the party has done. They find the party interesting in the way that someone interesting finds something interesting: with genuine engagement and no particular investment in the party's survival specifically.</p>
+<p>Eryndra Mael, when shown a description, was quiet for a longer moment than usual and then said: "How curious. When did you meet them?" She did not ask what they looked like.</p>`,
+        meta: [{ label: 'Race', value: 'Appears human' }, { label: 'Age', value: 'Indeterminate' }, { label: 'Affiliation', value: 'Unknown' }, { label: 'Disposition', value: 'Unpredictable' }]
+      },
+      vasha: {
+        tag: 'Hostile', title: 'Vasha Rel', subtitle: 'High Votary of the Dusk Covenant',
+        body: `<p>Vasha Rel is the most dangerous kind of true believer: one who is also intelligent, patient, and genuinely pleasant company. She holds open philosophical lectures in several cities. She runs a network of community kitchens. She is known for remembering the names of everyone she has ever met.</p>
+<p>She is also the operational head of the Dusk Covenant's most active cell, personally responsible for the weakening of at least two containment seals whose purpose is not fully understood by anyone outside the Covenant.</p>
+<p>Vasha does not consider herself evil. She genuinely believes that the return of the old gods will be, on net, better for mortal civilization than the current arrangement. She has a sophisticated argument for this position. The argument is wrong, but it is not stupid. She is curious about the party and has not moved against them directly despite having had opportunity. It might be because she finds them useful. It might be because she finds them interesting. It might be both.</p>`,
+        meta: [{ label: 'Race', value: 'Half-elf' }, { label: 'Age', value: 'c. 60' }, { label: 'Affiliation', value: 'Dusk Covenant' }, { label: 'Disposition', value: 'Hostile' }]
+      }
+    },
+    artifact: {
+      'hollow-crown': {
+        tag: 'Legendary Artifact', title: 'The Hollow Crown', subtitle: 'Origin: pre-Sundering · Current location: unknown',
+        body: `<p>The Hollow Crown is described in seventeen independent pre-Sundering sources, which is unusual given how little written material survived from that period. Every description agrees on the appearance: a circlet of black iron with twelve empty settings where gemstones once sat. Whatever originally filled those settings was removed before the earliest recorded account.</p>
+<p>The consistent claim is that wearing the Crown grants an authority of voice that transcends language barriers, social hierarchies, and the will of the listener. Commands given while wearing it are obeyed — not through magical compulsion but something older, an impression of absolute legitimacy the mind does not question.</p>
+<p>The consistent warning is that it also grants the appetite of what it was made for. Every documented wearer developed an expanding certainty that they were correct about everything. The longest documented wearing was eleven days. The wearer spent the last four trying to teach birds to talk so they would have someone worthy of their instructions.</p>`,
+        meta: [{ label: 'Rarity', value: 'Legendary' }, { label: 'Type', value: 'Wondrous item' }, { label: 'Origin', value: 'Pre-Sundering' }, { label: 'Status', value: 'Location unknown' }]
+      },
+      'ember-codex': {
+        tag: 'Rare Artifact', title: 'The Ember Codex', subtitle: 'A self-writing spellbook of uncertain intent',
+        body: `<p>The Ember Codex is bound in leather that feels warm to the touch regardless of ambient temperature. It has 340 pages. The number has not changed in any documented examination over the past two hundred years, despite the fact that its contents change regularly.</p>
+<p>When left near any open flame, the Codex writes. The spells it records are functional — this has been tested — but they are not always the spells cast nearby, and they are not always spells documented anywhere else. The Verdant Archive has catalogued 47 spells found exclusively in the Codex. Twelve they consider safe to study. Seven safe to attempt. Two worked. One did something nobody has been able to fully describe.</p>
+<p>Its previous owner, a scholar named Orren Vass, was found dead in Year 1,061 surrounded by candles and open to a page no one has since been able to read. The coroner listed the cause of death as curiosity. This was a professional assessment and not a joke.</p>`,
+        meta: [{ label: 'Rarity', value: 'Rare' }, { label: 'Type', value: 'Spellbook (unique)' }, { label: 'Last owner', value: 'Orren Vass (deceased)' }, { label: 'Status', value: 'In circulation' }]
+      },
+      'quiet-blade': {
+        tag: 'Rare Artifact', title: 'Velanthas, the Quiet Blade', subtitle: 'A shortsword of perfect, unnerving silence',
+        body: `<p>Velanthas looks ordinary. A shortsword of good but unremarkable make — slightly shorter than standard, plain crossguard, grip wrapped in dark leather. It does not glow. It does not hum. It does not feel magical to any conventional detection method.</p>
+<p>It makes no sound. Not merely a quiet blade — no sound. Drawing it produces nothing. Impact against any surface produces nothing. Whoever is struck by Velanthas is similarly silenced for approximately three seconds following the strike, regardless of what they might have to say about the experience.</p>
+<p>There have been six confirmed owners in the past century. Two are dead. Three have disappeared. One is currently trying to sell it and finding that serious buyers are somewhat difficult to locate, for reasons they are reluctant to explain to someone holding a silent knife.</p>`,
+        meta: [{ label: 'Rarity', value: 'Rare' }, { label: 'Type', value: 'Weapon (shortsword)' }, { label: 'Origin', value: 'Ember Throne era' }, { label: 'Status', value: 'For sale (currently)' }]
+      },
+      'wayward-compass': {
+        tag: 'Uncommon Artifact', title: 'The Wayward Compass', subtitle: 'Points toward what you want — or what you fear',
+        body: `<p>The Wayward Compass is brass, palm-sized, and unremarkable in appearance except that its needle never points north. It has been comprehensively tested. The needle is not magnetic. It does not respond to any known field. It simply points.</p>
+<p>In documented use, the needle consistently orients toward whatever the holder most wants — not what they say they want, or what they think they want, but what they actually want at the time of consultation. This is more useful than it sounds and more unsettling than expected.</p>
+<p>On nights when neither moon is visible, a minority of users report that the compass points not toward desire but toward the thing they most fear encountering. The transition between these states is not smooth and not announced. Several adventuring parties have reported that consulting it in high-stress situations produced directions they found deeply inconvenient and personally revealing.</p>`,
+        meta: [{ label: 'Rarity', value: 'Uncommon' }, { label: 'Type', value: 'Wondrous item' }, { label: 'Moon condition', value: 'Documented (disputed)' }, { label: 'Status', value: 'Available' }]
+      }
+    }
+  };
+
+  // ═══════════════════════════════════════════
+  //  MODAL LOGIC
+  // ═══════════════════════════════════════════
+  function openModal(type, key) {
+    const data = LORE[type] && LORE[type][key];
+    if (!data) return;
+    const metaHTML = data.meta ? `
+    <div class="modal-meta-grid">${data.meta.map(m => `<div class="modal-meta-item"><span>${m.label}</span>${m.value}</div>`).join('')}</div>
+    <div class="modal-divider"></div>` : '';
+    document.getElementById('modal-inner').innerHTML = `
+    <div class="modal-tag">${data.tag}</div>
+    <h2>${data.title}</h2>
+    <p class="modal-subtitle">${data.subtitle}</p>
+    <div class="modal-divider"></div>
+    ${metaHTML}
+    <div class="modal-section-label">Lore</div>
+    <div class="modal-body">${data.body}</div>`;
+    document.getElementById('modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('modal-overlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+
+  // ═══════════════════════════════════════════
+  //  LEAFLET MAP
+  //  Coordinates are fictional-flavoured placements
+  //  on real-world geography — your players won't
+  //  recognise them. Swap with a custom image overlay
+  //  if you create your own world map image later.
+  //
+  //  To move a pin: change lat/lng values below.
+  //  To add a pin:  copy one entry and add a matching
+  //                 key to LORE.location above.
+  // ═══════════════════════════════════════════
+  (function initMap() {
+    // Define the bounds of your image in a fake coordinate system.
+// [0,0] is bottom-left, [height, width] is top-right.
+// Adjust these numbers to match your image's pixel dimensions.
+    const imgWidth  = 2048;  // ← your image width in px
+    const imgHeight = 2048;  // ← your image height in px
+
+    const bounds = [[0, 0], [imgHeight, imgWidth]];
+
+    const map = L.map('world-map', {
+      crs: L.CRS.Simple,        // flat coordinate system, no globe
+      center: [imgHeight / 2, imgWidth / 2],
+      zoom: -2,                 // start zoomed out enough to see the whole map
+      minZoom: -3,
+      maxZoom: 2,
+    });
+
+    L.imageOverlay('Xohos.png', bounds).addTo(map);  // ← your image filename here
+    map.fitBounds(bounds);
+
+    function makeIcon(emoji) {
+      return L.divIcon({
+        className: '',
+        html: `<div style="background:#1a1208;border:1.5px solid #c9a84c;border-radius:50% 50% 50% 0;transform:rotate(-45deg);width:30px;height:30px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.7);font-size:13px;"><span style="transform:rotate(45deg);line-height:1">${emoji}</span></div>`,
+        iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -34],
+      });
+    }
+
+    // ── Location pins ──────────────────────────────────────────────
+    // Adjust lat/lng freely — these are placed to look plausible on
+
+    const pins = [
+      { key: 'tasburg', lat: 700, lng: 1250, emoji: '👑', name: 'Tasburg', sub: 'Storby · Hovedstaden'},
+      { key: 'vlada', lat: 1400, lng: 1050, emoji: '❄️', name: 'Vlada',sub: 'By · Kaldt'},
+      { key: 'nung',  lat: 900, lng: 550, emoji: '🪄', name: 'Nung', sub: 'By · Magiens sete'},
+      { key: 'sporan', lat: 1200, lng: 1475, emoji: '📯', name: 'Sporan', sub: 'Landsby · Skjult skatt'},
+      { key: 'poyos', lat: 400, lng: 1700, emoji: '🐟', name: 'Poyos', sub: 'Havneby · Fisk'},
+      { key: 'pria', lat: 1520, lng: 1375, emoji: '⚒️', name: 'Pria', sub: 'Bygd · Handelsbygd'},
+      { key: 'odberg', lat: 325, lng: 1250, emoji: '🐄', name: 'Odberg', sub: 'Utkantstrøk · Agrikultur'},
+      { key: 'tugan', lat: 1800, lng: 1550, emoji: '⛏️', name: 'Tugan', sub: 'By · Gruver og mineraler'},
+      { key: 'veskog', lat: 1250, lng: 650, emoji: '🌳', name: 'Veskog', sub: 'Grend · Trehogst'},
+      { key: 'abral', lat: 1850, lng: 850, emoji: '📜', name: 'Abral', sub: 'Gammel by · Antikkens storhet'},
+    ];
+
+    pins.forEach(loc => {
+      L.marker([loc.lat, loc.lng], { icon: makeIcon(loc.emoji) })
+              .addTo(map)
+              .bindPopup(`<strong>${loc.name}</strong><em>${loc.sub}</em><button class="popup-open-btn" onclick="openModal('location','${loc.key}')">Les mer →</button>`, { maxWidth: 230, closeOnClick: false });
+    });
+  })();
+</script>
 </body>
 </html>
