@@ -628,7 +628,7 @@
       maxZoom: 2,
     });
 
-    L.imageOverlay('Xohos.png', bounds).addTo(map);  // ← your image filename here
+    L.imageOverlay('./public/Xohos.png', bounds).addTo(map);  // ← your image filename here
     map.fitBounds(bounds);
 
     function makeIcon(emoji) {
