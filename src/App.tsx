@@ -1,121 +1,125 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from "react";
+import MapView from "./components/MapView";
+import DetailModal, { type DetailEntity } from "./components/DetailModal";
+import CardGrid from "./components/CardGrid";
+import { towns } from "./data/towns";
+import { npcs } from "./data/npcs";
+import { items } from "./data/items";
+import { sessions } from "./data/sessions";
 
-function App() {
-  const [count, setCount] = useState(0)
+type Tab = "map" | "towns" | "npcs" | "items" | "sessions";
+type Selection = { entity: DetailEntity };
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: "map", label: "Map" },
+  { id: "towns", label: "Towns" },
+  { id: "npcs", label: "NPCs" },
+  { id: "items", label: "Items" },
+  { id: "sessions", label: "Session Notes" },
+];
+
+export default function App() {
+  const [tab, setTab] = useState<Tab>("map");
+  const [selection, setSelection] = useState<Selection | null>(null);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      <div className="app">
+        <header className="header">
+          <h1>Campaign Compendium</h1>
+          <nav>
+            {TABS.map((t) => (
+                <button
+                    key={t.id}
+                    className={tab === t.id ? "tab active" : "tab"}
+                    onClick={() => setTab(t.id)}
+                >
+                  {t.label}
+                </button>
+            ))}
+          </nav>
+        </header>
 
-      <div className="ticks"></div>
+        <main>
+          {tab === "map" && (
+              <>
+                <MapView
+                    towns={towns}
+                    onSelectTown={(town) => setSelection({ entity: town })}
+                />
+                <p className="hint">Click a pin to read about the town.</p>
+              </>
+          )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          {tab === "towns" && (
+              <CardGrid
+                  cards={towns.map((t) => ({
+                    id: t.id,
+                    name: t.name,
+                    subtitle: t.population,
+                    image: t.image,
+                  }))}
+                  onSelect={(id) => {
+                    const town = towns.find((t) => t.id === id)!;
+                    setSelection({ entity: town });
+                  }}
+              />
+          )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          {tab === "npcs" && (
+              <CardGrid
+                  cards={npcs.map((n) => ({
+                    id: n.id,
+                    name: n.name,
+                    subtitle: `${n.race} · ${n.occupation}`,
+                    image: n.image,
+                  }))}
+                  onSelect={(id) => {
+                    const npc = npcs.find((n) => n.id === id)!;
+                    setSelection({ entity: npc });
+                  }}
+              />
+          )}
+
+          {tab === "items" && (
+              <CardGrid
+                  cards={items.map((i) => ({
+                    id: i.id,
+                    name: i.name,
+                    subtitle: i.rarity,
+                    image: i.image,
+                  }))}
+                  onSelect={(id) => {
+                    const item = items.find((i) => i.id === id)!;
+                    setSelection({ entity: item });
+                  }}
+              />
+          )}
+
+          {tab === "sessions" && (
+              <div className="session-list">
+                {[...sessions]
+                    .sort((a, b) => b.sessionNumber - a.sessionNumber)
+                    .map((s) => (
+                        <article key={s.id} className="session">
+                          <h3>
+                            Session {s.sessionNumber}: {s.title}
+                          </h3>
+                          <p className="session-meta">
+                            {s.date} · {s.playerNames.join(", ")}
+                          </p>
+                          <p>{s.summary}</p>
+                        </article>
+                    ))}
+              </div>
+          )}
+        </main>
+
+        {selection && (
+            <DetailModal
+                entity={selection.entity}
+                onClose={() => setSelection(null)}
+            />
+        )}
+      </div>
+  );
 }
-
-export default App
