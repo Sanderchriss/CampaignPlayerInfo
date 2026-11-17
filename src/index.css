@@ -43,14 +43,53 @@ nav { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
   overflow: hidden;
   border: 1px solid #3a3054;
   background: #0d0a14;
+  touch-action: none; /* let pointer events drive panning on touch devices */
+  cursor: grab;
+}
+.map-container:active { cursor: grabbing; }
+.map-world {
+  position: relative;
+  transform-origin: 0 0; /* translate/scale math assumes top-left origin */
+}
+.map-world img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+}
+.town-pin {
+  position: absolute;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 .town-pin-dot {
+  display: block;
   width: 18px; height: 18px;
   background: var(--accent);
   border: 3px solid #fff3c4;
   border-radius: 50%;
   box-shadow: 0 0 10px rgba(201, 162, 39, 0.9);
 }
+
+/* World history */
+.world-history {
+  margin-top: 1.5rem;
+  background: var(--panel);
+  border: 1px solid #3a3054;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+}
+.world-history h2 {
+  margin: 0 0 0.75rem;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+.history-entry { margin-bottom: 1rem; }
+.history-entry:last-child { margin-bottom: 0; }
+.history-entry h3 { margin: 0 0 0.25rem; color: var(--accent); }
+.history-entry p { margin: 0; line-height: 1.5; }
 
 /* Cards */
 .card-grid {

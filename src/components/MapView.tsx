@@ -7,8 +7,6 @@ interface MapViewProps {
 }
 
 const MAP_IMAGE = "./Xohos.png";
-const MAP_WIDTH = 2000;
-const MAP_HEIGHT = 1200;
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 4;
 
@@ -17,6 +15,9 @@ const clamp = (v: number, min: number, max: number) =>
 
 export default function MapView({ towns, onSelectTown }: MapViewProps) {
     const containerRef = useRef<HTMLDivElement>(null);
+    // Real pixel size of the image, read on load. Pins are positioned as
+    // fractions of THIS size, so changing a coordinate always moves the pin.
+    const [dims, setDims] = useState({ width: 0, height: 0 });
     const [view, setView] = useState({ x: 0, y: 0, scale: 1 });
     const drag = useRef({
         active: false,
@@ -27,20 +28,33 @@ export default function MapView({ towns, onSelectTown }: MapViewProps) {
         originY: 0,
     });
 
-    // Fit the whole map in the container on mount
-    useEffect(() => {
+    // Scale the image so it completely FILLS the container (like object-fit: cover).
+    const fit = (width: number, height: number) => {
         const el = containerRef.current;
-        if (!el) return;
-        const scale = Math.min(
-            el.clientWidth / MAP_WIDTH,
-            el.clientHeight / MAP_HEIGHT
+        if (!el || !width) return;
+        const scale = Math.max(
+            el.clientWidth / width,
+            el.clientHeight / height
         );
         setView({
             scale,
-            x: (el.clientWidth - MAP_WIDTH * scale) / 2,
-            y: (el.clientHeight - MAP_HEIGHT * scale) / 2,
+            x: (el.clientWidth - width * scale) / 2,
+            y: (el.clientHeight - height * scale) / 2,
         });
-    }, []);
+    };
+
+    const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+        const img = e.currentTarget;
+        setDims({ width: img.naturalWidth, height: img.naturalHeight });
+        fit(img.naturalWidth, img.naturalHeight);
+    };
+
+    // Refit when the window resizes
+    useEffect(() => {
+        const onResize = () => fit(dims.width, dims.height);
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+    }, [dims]);
 
     // Wheel zoom around the cursor (needs a non-passive listener)
     useEffect(() => {
@@ -108,15 +122,15 @@ export default function MapView({ towns, onSelectTown }: MapViewProps) {
             <div
                 className="map-world"
                 style={{
-                    width: MAP_WIDTH,
-                    height: MAP_HEIGHT,
+                    width: dims.width,
+                    height: dims.height,
                     transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})`,
                 }}
             >
-                <img src={MAP_IMAGE} alt="Map" draggable={false} />
+                <img src={MAP_IMAGE} alt="Map" draggable={false} onLoad={onImageLoad} />
                 {towns.map((town) => (
                     <button
-                        key={town.name}
+                        key={town.id}
                         type="button"
                         className="town-pin"
                         title={town.name}
